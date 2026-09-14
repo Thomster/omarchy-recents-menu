@@ -267,10 +267,21 @@ Item {
     root.rowsLoaded = true
     // recentAppRows() (see rebuildDisplay) needs "apps.<id>" entries in
     // root.items before the root menu first renders, not just after the user
-    // opens Apps and triggers the normal on-demand load below.
-    if (root.appLibrary && !root.providersLoaded["apps"]) {
-      root.providersLoaded["apps"] = true
+    // opens Apps and triggers the normal on-demand load below. DesktopEntries
+    // populates asynchronously over several seconds after shell startup, so
+    // this first attempt usually finds zero apps. Deliberately NOT marked in
+    // providersLoaded: the shell's plugin-facing AppLibrary proxy declares an
+    // appsChanged signal (PluginAppLibraryApi.qml) but never actually emits
+    // it, so there is no reliable live-update to depend on here -- leaving
+    // providersLoaded["apps"] unset means opening Apps directly still runs
+    // its own on-demand merge (via startProviderForMenu) instead of reusing
+    // this possibly-empty result. appLibraryWarmup below retries this same
+    // best-effort merge so the root menu's recent-apps row also recovers
+    // without requiring the user to open Apps first.
+    if (root.appLibrary) {
       root.mergeAppRows()
+      appLibraryWarmup.attempts = 0
+      appLibraryWarmup.restart()
     }
     root.evaluateGuards()
     if (root.opened) {
@@ -992,6 +1003,21 @@ Item {
     target: root.appLibrary
     function onAppsChanged() {
       if (root.providersLoaded["apps"]) root.mergeAppRows()
+    }
+  }
+
+  // Polls the eager apps merge for a few seconds after each rebuild, since
+  // DesktopEntries's initial scan is asynchronous and (see
+  // rebuildItemsFromSources) there is no working signal to wait on instead.
+  Timer {
+    id: appLibraryWarmup
+    interval: 400
+    repeat: true
+    property int attempts: 0
+    onTriggered: {
+      attempts += 1
+      if (root.appLibrary) root.mergeAppRows()
+      if (attempts >= 15) stop()
     }
   }
 
