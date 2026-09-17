@@ -77,7 +77,16 @@ Item {
 
   // Shared application engine (entries, hidden filters, icons, launch,
   // removal), owned by the shell and also used by the standalone launcher.
-  readonly property var appLibrary: root.shell ? root.shell.appLibrary : null
+  // Because this manifest declares both "menu" and "bar-widget" kinds, the
+  // shell's createScopedPluginShell() path can bake in a permanent
+  // appLibrary: null for this clone -- either via the Array.isArray race
+  // this repo originally diagnosed, or via a second, still-unexplained path
+  // that Yacl222 confirmed produces the same permanent null even without
+  // that race (see omacom/omarchy#11788, and the fix landed for cloned
+  // "menu" plugins generally in omacom/omarchy#11028). Falling back to a
+  // local AppLibrary instance sidesteps the shell's proxy entirely instead
+  // of waiting on it to ever resolve.
+  readonly property var appLibrary: (root.shell && root.shell.appLibrary) ? root.shell.appLibrary : localAppLibrary
 
   // Recently launched apps, shown above a divider on the root menu. Only apps
   // launched via the Apps submenu (row.kind === "app") are recorded -- see
@@ -997,6 +1006,14 @@ Item {
   PointerMoveGate {
     id: pointerGate
     referenceItem: card
+  }
+
+  // Fallback engine for when shell.appLibrary comes back null (see
+  // root.appLibrary above). Harmless to run alongside the shell's own
+  // instance when it isn't needed -- it just duplicates the same
+  // DesktopEntries scan the shell already does.
+  AppLibrary {
+    id: localAppLibrary
   }
 
   Connections {
