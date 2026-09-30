@@ -78,6 +78,14 @@ anyone wants to fix `createScopedPluginShell()`/`manifestHasKind()` itself,
 but this plugin no longer depends on that landing. This repo is currently
 private; ping me if you'd like access.
 
+## Related
+
+Part of a set of drop-in replacements for Omarchy's stock bar widgets, all named "*Stock name* (*Feature*)": [omarchy-session-actions-power](https://github.com/Thomster/omarchy-session-actions-power), [omarchy-radio-status-network](https://github.com/Thomster/omarchy-radio-status-network), [omarchy-arrange-monitor](https://github.com/Thomster/omarchy-arrange-monitor).
+
+## Changelog
+
+Current version: **1.0.3**. See [CHANGELOG.md](CHANGELOG.md).
+
 ## How this came to be
 
 This is a personal customization for my own Omarchy setup, built with the

@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "omarchy_plus_recents.menu",
   "name": "Omarchy Menu (Recent Apps)",
-  "version": "1.0.0",
-  "author": "Thomas",
-  "description": "Omarchy command menu with a recently-launched-apps row on the root menu",
+  "version": "1.0.3",
+  "author": "Claude Code / Thomas Alt",
+  "description": "Replaces the Omarchy menu with a clone that adds a row of recently launched apps to the root menu.",
   "kinds": [
     "menu",
     "bar-widget"
@@ -16,7 +16,7 @@
   },
   "barWidget": {
     "displayName": "Omarchy Menu (Recent Apps)",
-    "description": "Launches the Omarchy menu",
+    "description": "Replaces the Omarchy menu with a clone that adds a row of recently launched apps to the root menu.",
     "category": "Compositor",
     "allowMultiple": false
   },
